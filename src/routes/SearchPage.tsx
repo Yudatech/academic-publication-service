@@ -2,6 +2,7 @@ import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchWorksPage } from "../api/openalex";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
+import PublicationItem from "@/components/PublicationItem";
 
 export default function SearchPage() {
   const [search, setSearch] = useState("climate change");
@@ -21,10 +22,11 @@ export default function SearchPage() {
   });
 
   const all: any[] = query.data?.pages.flatMap((p) => p.results) ?? [];
-
+  const totalCount = query.data?.pages.flatMap((p) => p.meta);
+  console.log("totalCount", totalCount);
   return (
     <>
-      <SearchBar />
+      <SearchBar searchQuery={search} setSearchQuery={setSearch} />
       <section aria-live="polite" className="grid gap-3">
         {query.isLoading && (
           <div className="text-sm text-neutral-600">Loading…</div>
@@ -40,12 +42,11 @@ export default function SearchPage() {
         {!query.isLoading && all.length === 0 && (
           <div className="text-sm">No results.</div>
         )}
-        {/* {all.map((w) => (
-          <>
-            <div>{w.id}</div>
-            <div>{w.title}</div>
-          </>
-        ))} */}
+
+        {all.length > 0 &&
+          all.map((item, index) => (
+            <PublicationItem key={`publish-item-${index}`} item={item} />
+          ))}
       </section>
     </>
   );
