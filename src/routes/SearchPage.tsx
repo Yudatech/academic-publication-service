@@ -1,6 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchWorksPage } from "../api/openalex";
 import { useState } from "react";
+import SearchBar from "@/components/SearchBar";
 
 export default function SearchPage() {
   const [search, setSearch] = useState("climate change");
@@ -8,7 +9,7 @@ export default function SearchPage() {
   const query = useInfiniteQuery({
     queryKey: ["works", search],
     queryFn: ({ pageParam = 1 }) =>
-      fetchWorksPage({ search, page: pageParam, perPage: 50 }),
+      fetchWorksPage({ search, page: pageParam, perPage: 25 }),
     initialPageParam: 1,
     getNextPageParam: (last) => {
       const { page, per_page, count } = last.meta;
@@ -23,6 +24,7 @@ export default function SearchPage() {
 
   return (
     <>
+      <SearchBar />
       <section aria-live="polite" className="grid gap-3">
         {query.isLoading && (
           <div className="text-sm text-neutral-600">Loading…</div>
@@ -38,12 +40,12 @@ export default function SearchPage() {
         {!query.isLoading && all.length === 0 && (
           <div className="text-sm">No results.</div>
         )}
-        {all.map((w) => (
+        {/* {all.map((w) => (
           <>
             <div>{w.id}</div>
             <div>{w.title}</div>
           </>
-        ))}
+        ))} */}
       </section>
     </>
   );

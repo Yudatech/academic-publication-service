@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import SearchPage from "./routes/SearchPage";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import "./index.css";
 
 const router = createBrowserRouter([
   {
