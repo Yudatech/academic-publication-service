@@ -1,13 +1,24 @@
 import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
-import { fetchWorksPage } from "../api/openalex";
+import { fetchWorksPage, type WorksResponse } from "../api/openalex";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import PublicationItem from "@/components/PublicationItem";
+import {
+  type RawWork,
+  RawWorkSchema,
+  workDataParser,
+} from "@/adapters/dataParser";
 
 export default function SearchPage() {
   const [search, setSearch] = useState("climate change");
 
-  const query = useInfiniteQuery({
+  const query = useInfiniteQuery<
+    WorksResponse<RawWork>,
+    Error,
+    RawWork[],
+    ["works", string],
+    number
+  >({
     queryKey: ["works", search],
     queryFn: ({ pageParam = 1 }) =>
       fetchWorksPage({ search, page: pageParam, perPage: 25 }),
@@ -19,11 +30,16 @@ export default function SearchPage() {
     },
     placeholderData: keepPreviousData,
     staleTime: 60_000,
+    select: (data) =>
+      data.pages.flatMap((p) =>
+        (p.results as unknown[]).map((r) => RawWorkSchema.parse(r))
+      ),
   });
 
-  const all: any[] = query.data?.pages.flatMap((p) => p.results) ?? [];
-  const totalCount = query.data?.pages.flatMap((p) => p.meta);
-  console.log("totalCount", totalCount);
+  const items: RawWork[] = query.data ?? [];
+
+  const parsedData = items.map((item) => workDataParser(item));
+
   return (
     <>
       <SearchBar searchQuery={search} setSearchQuery={setSearch} />
@@ -39,12 +55,13 @@ export default function SearchPage() {
             </div>
           </div>
         )}
-        {!query.isLoading && all.length === 0 && (
+        {/* {!query.isLoading && all.length === 0 && (
           <div className="text-sm">No results.</div>
-        )}
+        )} */}
 
-        {all.length > 0 &&
-          all.map((item, index) => (
+        {parsedData &&
+          parsedData?.length > 0 &&
+          parsedData.map((item, index) => (
             <PublicationItem key={`publish-item-${index}`} item={item} />
           ))}
       </section>

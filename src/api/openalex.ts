@@ -1,3 +1,4 @@
+import { type RawWork } from "@/adapters/dataParser";
 const BASE = "https://api.openalex.org";
 const MAILTO = import.meta.env.VITE_OPENALEX_MAILTO;
 
@@ -7,9 +8,9 @@ export type GroupBucket = {
   count: number;
 };
 
-export type WorksResponse = {
+export type WorksResponse<T> = {
   meta: { count: number; page: number; per_page: number };
-  results: any[];
+  results: T[];
 };
 
 export function buildWorksUrl({
@@ -33,7 +34,7 @@ export async function fetchWorksPage(args: {
   search?: string;
   page?: number;
   perPage?: number;
-}): Promise<WorksResponse> {
+}): Promise<WorksResponse<RawWork>> {
   const url = buildWorksUrl(args);
   console.debug("[OpenAlex] GET", url);
   let res: Response;

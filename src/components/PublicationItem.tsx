@@ -13,53 +13,54 @@ export default function PublicationItem({ item }: { item: Publication }) {
             <h3 className="text-xl font-semibold text-foreground leading-tight flex-1">
               {item.title || "Untitled"}
             </h3>
-            {/* {item.type && (
-              <Badge variant="secondary" className="shrink-0">
-                {item.type.replace("-", " ")}
-              </Badge>
-            )} */}
           </div>
 
           {/* Authors */}
-          {item.authorships && item.authorships.length > 0 && (
-            <div className="flex items-start gap-2">
-              <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Authors:{" "}
-                </span>
-                <span className="text-sm">
-                  {item.authorships
-                    .slice(0, 5)
-                    .map((authorship) => authorship.author)
-                    .join(", ")}
-                  {item.authorships.length > 5 &&
-                    ` +${item.authorships.length - 5} more`}
-                </span>
-              </div>
-            </div>
-          )}
 
-          {item.publication_date && (
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-start gap-2">
+            <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <span className="text-sm font-medium text-muted-foreground">
+                Authors:{" "}
+              </span>
               <span className="text-sm">
-                <span className="font-medium text-muted-foreground">
-                  Published:{" "}
-                </span>
-                {item.publication_date}
+                {item.authors
+                  .slice(0, 5)
+                  .map((author) => author)
+                  .join(", ")}
+                {(item.authors.length > 5 &&
+                  ` +${item.authors.length - 5} more`) ||
+                  ""}
               </span>
             </div>
-          )}
+          </div>
 
-          {item.authorships && (
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">
+              <span className="font-medium text-muted-foreground">
+                Published:{" "}
+              </span>
+              {item.publicationDate || ""}
+            </span>
+          </div>
+
+          {item.institutions && (
             <div className="flex items-start gap-2">
               <Building className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
               <div className="flex-1">
                 <span className="text-sm font-medium text-muted-foreground">
                   Institutions:{" "}
                 </span>
-                <span className="text-sm"></span>
+                <span className="text-sm">
+                  {item.institutions
+                    .slice(0, 5)
+                    .map((ins) => ins)
+                    .join(", ")}
+                  {(item.institutions.length > 5 &&
+                    ` +${item.institutions.length - 5} more`) ||
+                    ""}
+                </span>
               </div>
             </div>
           )}
@@ -72,27 +73,19 @@ export default function PublicationItem({ item }: { item: Publication }) {
                   Research Topics:
                 </span>
                 <div className="flex flex-wrap gap-1">
-                  {item.concepts
-                    .filter((concept) => concept.score > 0.3)
-                    .slice(0, 6)
-                    .map((concept, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {concept.display_name}
-                      </Badge>
-                    ))}
+                  {item.concepts.slice(0, 6).map((concept, index) => (
+                    <Badge
+                      key={`${concept}-${index}`}
+                      variant="outline"
+                      className="text-xs"
+                    >
+                      {concept}
+                    </Badge>
+                  ))}
                 </div>
               </div>
             </div>
           )}
-
-          {/* Additional Info */}
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              {item.cited_by_count !== undefined && (
-                <span>Citations: {item.cited_by_count.toLocaleString()}</span>
-              )}
-            </div>
-          </div>
         </div>
       </CardContent>
     </Card>
