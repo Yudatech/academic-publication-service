@@ -1,7 +1,11 @@
-import { Bar } from "react-chartjs-2";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublicationsPerInstitution } from "@/api/openalex";
 import { makeBlueShades } from "@/adapters/utils";
+import { lazy, Suspense } from "react";
+
+const Bar = lazy(() =>
+  import("react-chartjs-2").then((m) => ({ default: m.Bar }))
+);
 
 export function BarChart({
   search,
@@ -52,5 +56,15 @@ export function BarChart({
       y: { ticks: { autoSkip: false } },
     },
   };
-  return <Bar data={data} options={options} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="h-80 grid place-items-center text-neutral-500">
+          Loading chart…
+        </div>
+      }
+    >
+      <Bar data={data} options={options} />
+    </Suspense>
+  );
 }

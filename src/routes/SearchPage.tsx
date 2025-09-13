@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
-import InfiniteList from "@/components/search/InfinityList";
+import InfiniteList from "@/components/search-page/InfinityList";
 
 const MIN_LEN = 2;
 

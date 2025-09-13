@@ -13,7 +13,7 @@ import {
   Legend,
 } from "chart.js";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { BarChart } from "@/components/dashBoard/BarChart";
+import { BarChart } from "@/components/dashboard-page/BarChart";
 
 ChartJS.register(
   BarElement,
@@ -77,6 +77,10 @@ export default function DashboardPage() {
               </button>
             </div>
           ) : q.isPending ? (
+            <div className="space-y-2" aria-busy="true" aria-live="polite">
+              <p className="text-sm text-neutral-600">Pending ...</p>
+            </div>
+          ) : q.isFetching ? (
             <div className="flex items-center space-x-4">
               <Skeleton className="h-12 w-12 rounded-full" />
               <div className="space-y-2">
