@@ -1,13 +1,13 @@
 import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchWorksPage, type WorksResponse } from "../api/openalex";
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import SearchBar from "@/components/SearchBar";
 import PublicationItem from "@/components/PublicationItem";
 import { workDataParser } from "@/adapters/dataParser";
 import { type RawWork, RawWorkSchema } from "@/adapters/utils";
 
 export default function SearchPage() {
-  const [search, setSearch] = useState("climate change");
+  const [searchQuery, setSearchQuery] = useState("climate change");
 
   const query = useInfiniteQuery<
     WorksResponse<RawWork>,
@@ -16,9 +16,9 @@ export default function SearchPage() {
     ["works", string],
     number
   >({
-    queryKey: ["works", search],
+    queryKey: ["works", searchQuery],
     queryFn: ({ pageParam = 1 }) =>
-      fetchWorksPage({ search, page: pageParam, perPage: 25 }),
+      fetchWorksPage({ search: searchQuery, page: pageParam, perPage: 25 }),
     initialPageParam: 1,
     getNextPageParam: (last) => {
       const { page, per_page, count } = last.meta;
@@ -33,13 +33,34 @@ export default function SearchPage() {
       ),
   });
 
-  const items: RawWork[] = query.data ?? [];
+  const items: RawWork[] = useMemo(() => query.data ?? [], [query.data]);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (
+          entry.isIntersecting &&
+          query.hasNextPage &&
+          !query.isFetchingNextPage
+        ) {
+          query.fetchNextPage();
+        }
+      },
+      { root: null, rootMargin: "800px 0px 800px 0px", threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [query.hasNextPage, query.isFetchingNextPage, query.fetchNextPage]);
 
   const parsedData = items.map((item) => workDataParser(item));
 
   return (
     <>
-      <SearchBar searchQuery={search} setSearchQuery={setSearch} />
+      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <section aria-live="polite" className="grid gap-3">
         {query.isLoading && (
           <div className="text-sm text-neutral-600">Loading…</div>
@@ -55,12 +76,28 @@ export default function SearchPage() {
         {/* {!query.isLoading && all.length === 0 && (
           <div className="text-sm">No results.</div>
         )} */}
+        <div className="grid gap-3" aria-live="polite">
+          {parsedData &&
+            parsedData?.length > 0 &&
+            parsedData.map((item, index) => (
+              <PublicationItem key={`publish-item-${index}`} item={item} />
+            ))}
 
-        {parsedData &&
-          parsedData?.length > 0 &&
-          parsedData.map((item, index) => (
-            <PublicationItem key={`publish-item-${index}`} item={item} />
-          ))}
+          {query.hasNextPage && (
+            <div
+              ref={sentinelRef}
+              className="py-6 text-center text-sm text-neutral-500"
+            >
+              {query.isFetchingNextPage ? "Loading more…" : "Scroll for more"}
+            </div>
+          )}
+
+          {!query.hasNextPage && items.length > 0 && (
+            <div className="py-6 text-center text-xs text-neutral-500">
+              — end —
+            </div>
+          )}
+        </div>
       </section>
     </>
   );

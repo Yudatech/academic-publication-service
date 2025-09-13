@@ -22,6 +22,7 @@ export default function SearchBar({
               <Input
                 id="search"
                 className="pl-10"
+                value={searchQuery}
                 placeholder="Enter keywords, topics, or research areas..."
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
