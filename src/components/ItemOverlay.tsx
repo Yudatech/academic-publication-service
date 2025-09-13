@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { type Publication } from "@/types/openalex";
-import { Tag, ExternalLink, BookOpen } from "lucide-react";
+import { Tag, ExternalLink, BookOpen, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/adapters/utils";
@@ -25,11 +25,11 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
     <Dialog open={open} onOpenChange={() => setDialogOpen(false)}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="border-b">
-          <DialogTitle className="text-xl font-bold leading-tight pr-8 py-4">
+          <DialogTitle className="text-xl font-bold leading-tight pr-8 py-6">
             {item.title || "Publication Details"}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+        <div className="space-y-6 my-4">
           {item.abstract && (
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2 ">
@@ -43,9 +43,9 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
           )}
 
           {/* Publication Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-4">
             {/* Citation Count */}
-            <div className="mx-4">
+            <div>
               <h4 className="font-semibold mb-2">Citation Count</h4>
               <p className="text-2xl font-bold text-primary">
                 {item.citedByCount?.toLocaleString() || "0"}
@@ -115,8 +115,11 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
             )}
 
             <div>
-              <h4 className="font-semibold mb-3">Access Information</h4>
-              <div className="space-y-2">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Link2 className="h-4 w-4" />
+                Access Information
+              </h4>
+              <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge
                     variant={item.openAccess?.isOA ? "outline" : "secondary"}
@@ -131,7 +134,7 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
                       : "Restricted Access"}
                   </Badge>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 ">
                   {item.ids.doi && (
                     <Button variant="outline" size="sm" asChild>
                       <a
@@ -170,23 +173,6 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Access Info */}
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              {item.citedByCount !== undefined && (
-                <span>Citations: {item.citedByCount.toLocaleString()}</span>
-              )}
-              {item.openAccess?.isOA && (
-                <Badge
-                  variant="outline"
-                  className="text-green-600 border-green-600"
-                >
-                  Open Access
-                </Badge>
-              )}
             </div>
           </div>
         </div>

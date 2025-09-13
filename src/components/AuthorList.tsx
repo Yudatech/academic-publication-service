@@ -14,12 +14,12 @@ export function AuthorList({
   return (
     <>
       {item.authors && item.authors.length > 0 && (
-        <div className="bg-muted/50 p-4 rounded-lg">
+        <div className="">
           <h4 className="font-semibold mb-3 flex items-center gap-2">
             <Users className="h-4 w-4" />
             Authors & Affiliations
           </h4>
-          <div className="space-y-3">
+          <div className="space-y-3 bg-muted/50 p-4 rounded-lg">
             {item.authors
               .slice(0, authorsExpanded ? undefined : 3)
               .map((authorship, index) => (

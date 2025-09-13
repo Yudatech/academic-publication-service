@@ -14,7 +14,7 @@ export default function PublicationItem({
     <>
       <Card
         key={item.id}
-        className="hover:shadow-lg transition-shadow"
+        className="hover:shadow-lg transition-shadow cursor-pointer"
         onClick={onOpen}
       >
         <CardContent className="p-6">

@@ -12,8 +12,7 @@ export default function SearchPage() {
   return (
     <>
       <div className="mb-10 text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-2 flex items-center gap-3 justify-center">
-          <BarChart3 className="h-8 w-8 text-primary" />
+        <h1 className="text-4xl font-bold text-foreground mb-2 items-center  justify-center">
           Research Dashboard
         </h1>
         <p className="text-muted-foreground text-lg">

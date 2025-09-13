@@ -1,25 +1,10 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Navbar from "@/components/Navbar";
 
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
-          <div className="font-semibold">
-            OpenAlex · Climate in Denmark (2025)
-          </div>
-          <nav className="ml-auto text-sm">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                isActive ? "underline" : "hover:underline"
-              }
-            >
-              Search
-            </NavLink>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
       <main className="mx-auto max-w-6xl w-full px-4 py-6 flex-1">
         <Outlet />
       </main>
