@@ -6,12 +6,16 @@ import App from "./App";
 import SearchPage from "./routes/SearchPage";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./index.css";
+import DashboardPage from "./routes/DashBoardPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    children: [{ index: true, element: <SearchPage /> }],
+    children: [
+      { index: true, element: <SearchPage /> },
+      { path: "dashboard", element: <DashboardPage /> },
+    ],
   },
 ]);
 

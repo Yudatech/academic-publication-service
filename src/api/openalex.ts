@@ -77,3 +77,26 @@ export async function fetchWorksPage(args: {
   }
   return res.json();
 }
+
+export async function fetchPublicationsPerInstitution({
+  search = "climate change",
+  top = 15,
+}: {
+  search?: string;
+  top?: number;
+}): Promise<GroupBucket[]> {
+  const u = new URL(`${BASE}/works`);
+  u.searchParams.set("search", search);
+  u.searchParams.set(
+    "filter",
+    "institutions.country_code:DK,from_publication_date:2023-01-01,to_publication_date:2025-12-31"
+  );
+  u.searchParams.set("group_by", "authorships.institutions.id");
+  u.searchParams.set("mailto", MAILTO);
+
+  const res = await fetch(u.toString());
+  if (!res.ok) throw new Error(`OpenAlex group_by failed: ${res.status}`);
+  const data = await res.json();
+  const buckets: GroupBucket[] = data.group_by ?? [];
+  return buckets.sort((a, b) => b.count - a.count).slice(0, top);
+}
