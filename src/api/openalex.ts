@@ -1,4 +1,4 @@
-import { type RawWork } from "@/adapters/dataParser";
+import { type RawWork } from "@/adapters/utils";
 const BASE = "https://api.openalex.org";
 const MAILTO = import.meta.env.VITE_OPENALEX_MAILTO;
 

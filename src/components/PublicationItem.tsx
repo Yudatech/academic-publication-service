@@ -2,20 +2,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Publication } from "@/types/openalex";
 import { Calendar, Users, Building, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 export default function PublicationItem({ item }: { item: Publication }) {
   return (
-    <Card key={item.id} className="hover:shadow-md transition-shadow">
+    <Card key={item.id} className="hover:shadow-lg transition-shadow">
       <CardContent className="p-6">
         <div className="space-y-4">
-          {/* Title and Type */}
           <div className="flex items-start justify-between gap-4">
             <h3 className="text-xl font-semibold text-foreground leading-tight flex-1">
               {item.title || "Untitled"}
             </h3>
           </div>
-
-          {/* Authors */}
 
           <div className="flex items-start gap-2">
             <Users className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
@@ -34,17 +32,7 @@ export default function PublicationItem({ item }: { item: Publication }) {
               </span>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">
-              <span className="font-medium text-muted-foreground">
-                Published:{" "}
-              </span>
-              {item.publicationDate || ""}
-            </span>
-          </div>
-
+          {/* TODO: refector the authors and users as reusable component */}
           {item.institutions && (
             <div className="flex items-start gap-2">
               <Building className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
@@ -52,7 +40,7 @@ export default function PublicationItem({ item }: { item: Publication }) {
                 <span className="text-sm font-medium text-muted-foreground">
                   Institutions:{" "}
                 </span>
-                <span className="text-sm">
+                <span className="text-sm text-wrap">
                   {item.institutions
                     .slice(0, 5)
                     .map((ins) => ins)
@@ -64,6 +52,16 @@ export default function PublicationItem({ item }: { item: Publication }) {
               </div>
             </div>
           )}
+
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">
+              <span className="font-medium text-muted-foreground">
+                Published:{" "}
+              </span>
+              {item.publicationDate || ""}
+            </span>
+          </div>
 
           {item.concepts && item.concepts.length > 0 && (
             <div className="flex items-start gap-2">

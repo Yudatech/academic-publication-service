@@ -3,11 +3,8 @@ import { fetchWorksPage, type WorksResponse } from "../api/openalex";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import PublicationItem from "@/components/PublicationItem";
-import {
-  type RawWork,
-  RawWorkSchema,
-  workDataParser,
-} from "@/adapters/dataParser";
+import { workDataParser } from "@/adapters/dataParser";
+import { type RawWork, RawWorkSchema } from "@/adapters/utils";
 
 export default function SearchPage() {
   const [search, setSearch] = useState("climate change");
