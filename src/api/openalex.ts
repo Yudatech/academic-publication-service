@@ -1,4 +1,4 @@
-import { type RawWork } from "@/adapters/utils";
+import { type RawWork } from "@/adapters/dataSchema";
 
 const BASE = "https://api.openalex.org";
 const MAILTO = import.meta.env.VITE_OPENALEX_MAILTO;
@@ -13,21 +13,43 @@ export type WorksResponse<T> = {
   meta: { count: number; page: number; per_page: number };
   results: T[];
 };
-
-export function buildWorksUrl({
-  search = "climate change",
+function buildWorksUrl({
+  search,
   page = 1,
-  perPage = 50,
+  perPage = 25,
 }: {
   search?: string;
   page?: number;
   perPage?: number;
 }) {
   const u = new URL(`${BASE}/works`);
-  u.searchParams.set("search", search);
+  if (search && search.trim() !== "") {
+    u.searchParams.set("search", search.trim());
+  }
+  u.searchParams.set(
+    "filter",
+    "institutions.country_code:DK,from_publication_date:2023-01-01,to_publication_date:2025-12-31"
+  );
   u.searchParams.set("per-page", String(perPage));
   u.searchParams.set("page", String(page));
   u.searchParams.set("mailto", MAILTO);
+  u.searchParams.set(
+    "select",
+    [
+      "id",
+      "display_name",
+      "publication_date",
+      "authorships",
+      "concepts",
+      "abstract_inverted_index",
+      "open_access",
+      "doi",
+      "ids",
+      "cited_by_count",
+      "primary_location",
+    ].join(",")
+  );
+
   return u.toString();
 }
 
