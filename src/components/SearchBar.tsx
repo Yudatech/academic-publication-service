@@ -1,23 +1,32 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
+import { Search } from "lucide-react";
+
+type Props = {
+  /** Controlled search value from parent */
+  searchQuery: string;
+  /** Update the parent’s controlled value (fires on every keystroke) */
+  setSearchQuery: (search: string) => void;
+  /** Commit the current query (parent decides what to do, e.g., trigger fetch) */
+  onSearch: (search?: string) => void;
+};
 
 export default function SearchBar({
   searchQuery,
   setSearchQuery,
   onSearch,
-}: {
-  searchQuery: string;
-  setSearchQuery: (search: string) => void;
-  onSearch: (search?: string) => void;
-}) {
+}: Props) {
+  // Local draft so we can manage UX without fighting the parent (still fully controlled via sync below)
   const [q, setQ] = useState(searchQuery);
+  // Keep local in sync if parent resets/changes externally
   useEffect(() => setQ(searchQuery), [searchQuery]);
+  // Derived UI flags
   const canSearch = q.trim().length >= 2;
 
+  // Submit handler: prevent default, only commit when valid
   function submit() {
     if (canSearch) onSearch(q);
   }
@@ -48,6 +57,7 @@ export default function SearchBar({
                   />
                 </div>
               </div>
+              {/* Actions */}
               <Button
                 onClick={submit}
                 disabled={!canSearch}

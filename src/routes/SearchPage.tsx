@@ -1,44 +1,33 @@
-import { useMemo, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { keepPreviousData } from "@tanstack/react-query";
+import { useMemo, useState, useCallback } from "react";
+import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
+
 import SearchBar from "@/components/SearchBar";
 import InfiniteList from "@/components/search-page/InfinityList";
 import ItemOverlay from "@/components/search-page/overlay/ItemOverlay";
+
 import { fetchWorksPage, type WorksResponse } from "@/api/openalex";
 import { type RawWork, RawWorkSchema } from "@/adapters/dataSchema";
 import { workDataParser } from "@/adapters/dataParser";
 import type { Publication } from "@/types/openalex";
+
 import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { LoadingCard } from "@/components/LoadingCard";
+
 import FilterPanel from "@/components/search-page/FilterPanel";
-import type { InstitutionsLite, FiltersDraft, Filters } from "@/types/filters";
+import type { FiltersDraft } from "@/types/filters";
 import { initialFiltersDraft } from "@/types/filters";
 
 const MIN_LEN = 2;
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeQuery, setActiveQuery] = useState<string>("");
-
-  const [enabled, setEnabled] = useState(false);
+  const [activeQuery, setActiveQuery] = useState<string>(""); // committed query (drives fetch)
 
   const [filtersDraft, setFiltersDraft] =
     useState<FiltersDraft>(initialFiltersDraft);
-  const instituionIds = useMemo(
-    () => filtersDraft.institutions.map((i) => i.id),
-    [filtersDraft]
-  );
-  const [selected, setSelected] = useState<Publication | null>(null);
 
-  function startSearch(q?: string) {
-    const search = (q ?? searchQuery).trim();
-    const approved = search.length >= MIN_LEN;
-    setActiveQuery(approved ? search : "");
-    setEnabled(approved);
-  }
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     setFiltersDraft({
       institutions: filtersDraft.institutions.length
         ? [...filtersDraft.institutions]
@@ -46,10 +35,27 @@ export default function SearchPage() {
       // authors: ...
       // concepts: ...
     });
+  }, [filtersDraft]);
+
+  const clearFilters = () => {
+    setFiltersDraft(initialFiltersDraft);
   };
 
-  function clearFilters() {
-    setFiltersDraft(initialFiltersDraft);
+  // --- Use **committed** institution IDs for the query
+  const instituionIds = useMemo(
+    () => filtersDraft.institutions.map((i) => i.id),
+    [filtersDraft]
+  );
+
+  // --- Control query enabled ---------------------
+  const [enabled, setEnabled] = useState(false);
+
+  // Commit the search only when the user clicks "Search" (or presses Enter)
+  function startSearch(q?: string) {
+    const search = (q ?? searchQuery).trim();
+    const approved = search.length >= MIN_LEN;
+    setActiveQuery(approved ? search : "");
+    setEnabled(approved);
   }
 
   const query = useInfiniteQuery<WorksResponse<RawWork>, Error>({
@@ -82,11 +88,16 @@ export default function SearchPage() {
       .flatMap((res) => (res.success ? [res.data] : []));
   }, [query.data]);
 
-  // Adapt to your UI’s Publication type
+  // Adapt to UI’s Publication type
   const items: Publication[] = useMemo(
     () => rawItems.map((rw) => workDataParser(rw)),
     [rawItems]
   );
+
+  // Overlay state
+  const [selected, setSelected] = useState<Publication | null>(null);
+  const openItem = useCallback((pub: Publication) => setSelected(pub), []);
+  const closeOverlay = useCallback(() => setSelected(null), []);
 
   return (
     <div className="space-y-6">
@@ -98,12 +109,14 @@ export default function SearchPage() {
           Discover research publications from OpenAlex database
         </p>
       </div>
-
+      {/* --- Search bar (controls committed activeQuery) ------------------- */}
       <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onSearch={startSearch}
       />
+
+      {/* --- Filter panel (edits draft; Apply commits to `filters`) -------- */}
       <FilterPanel
         value={filtersDraft}
         onChange={setFiltersDraft}
@@ -112,14 +125,15 @@ export default function SearchPage() {
         disabled={!enabled}
       />
 
+      {/* --- Empty / disabled hint ---------------------------------------- */}
       {!enabled && (
         <p className="text-sm text-neutral-600">
           Enter at least {MIN_LEN} characters to search.
         </p>
       )}
 
+      {/* --- Loading / error states --------------------------------------- */}
       {enabled && query.status === "pending" && <LoadingCard />}
-
       {enabled && query.status === "error" && (
         <Alert variant="destructive" className="max-w-xl">
           <AlertCircleIcon />
@@ -130,6 +144,7 @@ export default function SearchPage() {
         </Alert>
       )}
 
+      {/* --- Success: render infinite list + overlay ----------------------- */}
       {enabled && query.status === "success" && (
         <>
           <InfiniteList
@@ -138,12 +153,12 @@ export default function SearchPage() {
             isFetchingNextPage={!!query.isFetchingNextPage}
             isFetching={!!query.isFetching}
             fetchNextPage={() => query.fetchNextPage()}
-            onOpen={(pub) => setSelected(pub)}
+            onOpen={openItem}
           />
 
           <ItemOverlay
             open={!!selected}
-            setDialogOpen={() => setSelected(null)}
+            setDialogOpen={closeOverlay}
             item={selected}
           />
         </>

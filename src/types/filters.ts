@@ -7,5 +7,4 @@ export type FiltersDraft = {
 
 export type InstitutionsLite = { id: string; display_name: string };
 
-export type Filters = Partial<FiltersDraft>;
 export const initialFiltersDraft: FiltersDraft = { institutions: [] };

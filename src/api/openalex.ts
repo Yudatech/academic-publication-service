@@ -41,6 +41,7 @@ function buildWorksUrl({
     instituionIds && instituionIds.length > 0
       ? commonFilters.concat(`institutions.id:${instituionIds.join("|")}`)
       : commonFilters;
+
   const filterString = filters.join(",");
 
   u.searchParams.set("filter", filterString);

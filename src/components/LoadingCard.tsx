@@ -6,6 +6,12 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
+/**
+ * LoadingCard
+ * A reusable skeleton placeholder that mimics the shape of a typical result card.
+ * - Accessible by default (screen readers will announce “Loading…”)
+ */
+
 export function LoadingCard() {
   return (
     <Card className="h-[260px] flex flex-col overflow-hidden rounded-xl border transition-shadow">

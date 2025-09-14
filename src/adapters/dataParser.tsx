@@ -1,11 +1,20 @@
 import type { Publication, Author } from "../types/openalex";
 import {
   type RawWork,
-  summarizeInstitutions,
-  reconstructAbstract,
+  summarizeInstitutions, // de-duplicates + ranks institution names from authorships
+  reconstructAbstract, // converts OpenAlex abstract_inverted_index -> human text
 } from "./dataSchema";
 
+/**
+ * workDataParser
+ * Converts an OpenAlex `RawWork` (API shape) into a UI-friendly `Publication`.
+ * - Normalizes nullables to safe defaults for rendering
+ * - Builds author display + affiliation strings
+ * - Reconstructs abstract text from the inverted index
+ * - Collapses OA flags (open_access + primary_location) into a single boolean
+ */
 export function workDataParser(raw: RawWork): Publication {
+  // --- Authors & affiliations ---------------------------------------------
   const authors: Author[] = (raw.authorships || []).map((a) => {
     return {
       author: a.author?.display_name || "",
@@ -15,19 +24,33 @@ export function workDataParser(raw: RawWork): Publication {
     };
   });
 
+  // --- Open Access (OA) ----------------------------------------------------
   const isOA = raw.open_access?.is_oa || raw.primary_location?.is_oa || false;
+
+  // --- Institutions
+  const institutions = summarizeInstitutions(raw);
+
+  // --- Concepts ------------------------------------------------------------
+  // Map to simple { name, score } objects; default score to 0 when missing
+  const concepts =
+    raw.concepts?.map((c) => ({
+      name: c.display_name,
+      score: c.score ?? 0,
+    })) ?? [];
+
+  // --- Abstract ------------------------------------------------------------
+  // Reconstruct the plain-text abstract from the inverted index (if present)
+  const abstractText = reconstructAbstract(raw.abstract_inverted_index) ?? "";
 
   return {
     id: raw.id,
     title: raw.display_name,
     type: raw.type,
     authors: authors,
-    institutions: summarizeInstitutions(raw),
+    institutions: institutions,
     publicationDate: raw.publication_date,
-    concepts: raw.concepts?.map((concept) => {
-      return { name: concept.display_name, score: concept.score || 0 };
-    }),
-    abstract: reconstructAbstract(raw.abstract_inverted_index) || "",
+    concepts: concepts,
+    abstract: abstractText,
     openAccess: {
       isOA: isOA,
       oaStatus: raw.open_access?.oa_status,
