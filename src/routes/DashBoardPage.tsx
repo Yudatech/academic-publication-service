@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchPublicationsPerInstitution } from "@/api/openalex";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import {
@@ -14,6 +13,7 @@ import {
 } from "chart.js";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { BarChart } from "@/components/dashboard-page/BarChart";
+import { LoadingCard } from "@/components/LoadingCard";
 
 ChartJS.register(
   BarElement,
@@ -45,10 +45,14 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <header className="text-center">
-        <h1 className="text-3xl font-semibold mb-1">Research Dashboard</h1>
-      </header>
+    <div className="space-y-6">
+      <h1 className="mb-2 items-center justify-center text-4xl font-bold text-foreground text-center ">
+        Research Dashboard
+      </h1>
+      <p className="text-lg text-muted-foreground text-center">
+        Top institutions by publication count from OpenAlex database
+      </p>
+
       <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -77,17 +81,11 @@ export default function DashboardPage() {
               </button>
             </div>
           ) : q.isPending ? (
-            <div className="space-y-2" aria-busy="true" aria-live="polite">
-              <p className="text-sm text-neutral-600">Pending ...</p>
-            </div>
+            <p className="text-sm text-neutral-600">
+              Enter at least 2 characters to search for creating dashboard.
+            </p>
           ) : q.isFetching ? (
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
+            <LoadingCard />
           ) : (q.data?.length ?? 0) === 0 ? (
             <div className="text-sm text-neutral-600">No data available.</div>
           ) : (
