@@ -45,6 +45,7 @@ export function AuthorList({
                 size="sm"
                 onClick={() => setAuthorsExpanded(!authorsExpanded)}
                 className="text-xs text-muted-foreground hover:text-foreground"
+                aria-label="expand to show all authors"
               >
                 {authorsExpanded
                   ? `Show less (${item.authors.length - 3} authors hidden)`

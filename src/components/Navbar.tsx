@@ -6,7 +6,7 @@ function navClass({ isActive }: { isActive: boolean }) {
   return [
     "inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm transition",
     isActive
-      ? "bg-primary/10 text-primary"
+      ? "bg-black/90 text-white"
       : "hover:bg-neutral-100 text-neutral-700",
   ].join(" ");
 }

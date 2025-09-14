@@ -2,6 +2,11 @@ import { type RawWork } from "@/adapters/dataSchema";
 
 const BASE = "https://api.openalex.org";
 const MAILTO = import.meta.env.VITE_OPENALEX_MAILTO;
+const commonFilters: string[] = [
+  "institutions.country_code:DK",
+  "from_publication_date:2025-01-01",
+  "to_publication_date:2025-12-31",
+];
 
 export type GroupBucket = {
   key: string;
@@ -13,23 +18,32 @@ export type WorksResponse<T> = {
   meta: { count: number; page: number; per_page: number };
   results: T[];
 };
+
+type WorksPageArgs = {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  instituionIds?: string[];
+};
+
 function buildWorksUrl({
   search,
   page = 1,
   perPage = 25,
-}: {
-  search?: string;
-  page?: number;
-  perPage?: number;
-}) {
+  instituionIds,
+}: WorksPageArgs) {
   const u = new URL(`${BASE}/works`);
   if (search && search.trim() !== "") {
     u.searchParams.set("search", search.trim());
   }
-  u.searchParams.set(
-    "filter",
-    "institutions.country_code:DK,from_publication_date:2023-01-01,to_publication_date:2025-12-31"
-  );
+
+  const filters =
+    instituionIds && instituionIds.length > 0
+      ? commonFilters.concat(`institutions.id:${instituionIds.join("|")}`)
+      : commonFilters;
+  const filterString = filters.join(",");
+
+  u.searchParams.set("filter", filterString);
   u.searchParams.set("per-page", String(perPage));
   u.searchParams.set("page", String(page));
   u.searchParams.set("mailto", MAILTO);
@@ -57,6 +71,7 @@ export async function fetchWorksPage(args: {
   search?: string;
   page?: number;
   perPage?: number;
+  instituionIds?: string[];
 }): Promise<WorksResponse<RawWork>> {
   const url = buildWorksUrl(args);
   console.debug("[OpenAlex] GET", url);
@@ -87,10 +102,7 @@ export async function fetchPublicationsPerInstitution({
 }): Promise<GroupBucket[]> {
   const u = new URL(`${BASE}/works`);
   u.searchParams.set("search", search);
-  u.searchParams.set(
-    "filter",
-    "institutions.country_code:DK,from_publication_date:2023-01-01,to_publication_date:2025-12-31"
-  );
+  u.searchParams.set("filter", commonFilters.join(","));
   u.searchParams.set("group_by", "authorships.institutions.id");
   u.searchParams.set("mailto", MAILTO);
 

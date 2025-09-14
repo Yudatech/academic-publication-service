@@ -76,7 +76,11 @@ export default function DashboardPage() {
           {q.isError ? (
             <div className="rounded-lg border border-red-300 bg-red-50 text-red-900 px-4 py-3 text-sm">
               Couldn’t load data.{" "}
-              <button className="underline" onClick={() => q.refetch()}>
+              <button
+                className="underline"
+                aria-label="retry"
+                onClick={() => q.refetch()}
+              >
                 Retry
               </button>
             </div>

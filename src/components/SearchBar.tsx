@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
 
 export default function SearchBar({
   searchQuery,
@@ -26,14 +27,15 @@ export default function SearchBar({
       <CardContent className="p-6">
         <div className="flex gap-4 items-end">
           <div className="flex-1">
-            <label htmlFor="search" className="block text-sm font-medium mb-2">
+            <Label htmlFor="search" className="block text-sm font-medium mb-2">
               Search Publications
-            </label>
+            </Label>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
+                    type="search"
                     id="search"
                     className="pl-10"
                     value={searchQuery}
@@ -50,6 +52,7 @@ export default function SearchBar({
                 onClick={submit}
                 disabled={!canSearch}
                 className="bg-black text-white hover:bg-black/90 text-primary-foreground"
+                aria-label="apply search query"
               >
                 Search
               </Button>

@@ -136,7 +136,12 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
                 </div>
                 <div className="flex flex-wrap gap-3 ">
                   {item.ids.doi && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label="redirect to DOI"
+                      asChild
+                    >
                       <a
                         href={item.ids.doi}
                         target="_blank"
@@ -148,11 +153,17 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
                     </Button>
                   )}
                   {item.ids?.openalex && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label="redirect to openalex"
+                      asChild
+                    >
                       <a
                         href={item.ids?.openalex}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="redirect to openalex"
                       >
                         <ExternalLink className="h-3 w-3 mr-1" />
                         OpenAlex
@@ -165,6 +176,7 @@ export default function ItemOverlay({ open, setDialogOpen, item }: Props) {
                         href={item.primaryLocation?.pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="redirect to view pdf"
                       >
                         <ExternalLink className="h-3 w-3 mr-1" />
                         PDF
