@@ -27,7 +27,7 @@ export default function SearchPage() {
   const [filtersDraft, setFiltersDraft] =
     useState<FiltersDraft>(initialFiltersDraft);
 
-  const applyFilters = useCallback(() => {
+  const applyFilters = () => {
     setFiltersDraft({
       institutions: filtersDraft.institutions.length
         ? [...filtersDraft.institutions]
@@ -35,7 +35,7 @@ export default function SearchPage() {
       // authors: ...
       // concepts: ...
     });
-  }, [filtersDraft]);
+  };
 
   const clearFilters = () => {
     setFiltersDraft(initialFiltersDraft);
